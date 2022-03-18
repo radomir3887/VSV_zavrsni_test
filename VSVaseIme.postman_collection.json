@@ -1,0 +1,273 @@
+{
+	"info": {
+		"_postman_id": "286531c5-5a2c-439a-a2a3-230766b6c918",
+		"name": "VSVaseIme",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"\r",
+							"pm.environment.set(\"token\", jsonData.token)\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.environment.set(\"ownerId\", jsonData.user.id);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"email\":\"radomir3887@gmail.com\",\"password\":\"zvezdatelekom\",\"g-recaptcha-response\":\"\"}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}v2/login",
+					"host": [
+						"{{url}}v2"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add new organization",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"\r",
+							"pm.environment.set(\"organizationId\", jsonData.id)\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"var name = pm.environment.get(\"organizationName\");\r",
+							"pm.test(\"Name is ok\", function () {\r",
+							"  pm.expect(jsonData.name).to.equal(name);\r",
+							"});\r",
+							"\r",
+							"var mojUser = pm.environment.get(\"ownerId\");\r",
+							"tests[\"Organizacija je vezana za pravog usera\"] = mojUser == jsonData.owner_id;\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "{{organizationName}}",
+							"type": "text"
+						},
+						{
+							"key": "avatar_crop_cords",
+							"value": "{}",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/RADOMIR/Desktop/Akita.jpg"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}v2/organizations",
+					"host": [
+						"{{url}}v2"
+					],
+					"path": [
+						"organizations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add new organization without name",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"\r",
+							"});\r",
+							"\r",
+							" var jsonData = pm.response.json();\r",
+							"tests[ jsonData.name + \" , no credentials entered.\"] = jsonData.name = 'The name field is required.';\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "{{organizationName}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "avatar_crop_cords",
+							"value": "{}",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"value": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}v2/organizations",
+					"host": [
+						"{{url}}v2"
+					],
+					"path": [
+						"organizations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add new organization with wrong picture format on organization logo",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"\r",
+							"});\r",
+							"\r",
+							" var jsonData = pm.response.json();\r",
+							"tests[ jsonData.file + \" , wrong picture type.\"] = jsonData.file == 'The file must be a file of type: png, jpg, gif, jpeg, webp.';\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "organizacija sa pogresnim formatom slike1",
+							"type": "text"
+						},
+						{
+							"key": "avatar_crop_cords",
+							"value": "{}",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/RADOMIR/Desktop/sample_640×426.bmp"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}v2/organizations",
+					"host": [
+						"{{url}}v2"
+					],
+					"path": [
+						"organizations"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
